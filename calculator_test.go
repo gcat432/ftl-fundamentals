@@ -16,10 +16,9 @@ func TestAdd(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name        string
-		inputs      []float64
-		want        float64
-		errExpected bool
+		name   string
+		inputs []float64
+		want   float64
 	}
 
 	testCases := []testCase{
@@ -32,7 +31,7 @@ func TestAdd(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		got, _ := calculator.Add(tc.inputs...)
+		got := calculator.Add(tc.inputs...)
 		if tc.want != got {
 			t.Errorf("Add(%v): %s: want %f, got %f",
 				tc.inputs, tc.name, tc.want, got)
@@ -42,17 +41,16 @@ func TestAdd(t *testing.T) {
 
 func BenchmarkAdd(b *testing.B) {
 	type testCase struct {
-		name        string
-		inputs      []float64
-		want        float64
-		errExpected bool
+		name   string
+		inputs []float64
+		want   float64
 	}
 
 	tc := testCase{name: "Sum of some positive numbers",
 		inputs: []float64{2, 3, 4}}
 
 	for i := 0; i < b.N; i++ {
-		_, _ = calculator.Add(tc.inputs...)
+		_ = calculator.Add(tc.inputs...)
 	}
 }
 
@@ -60,14 +58,25 @@ func TestAddRandom(t *testing.T) {
 	t.Parallel()
 	rand.Seed(time.Now().UnixNano())
 
+	type testCase struct {
+		inputs []float64
+		want   float64
+	}
+
 	for i := 0; i < 100; i++ {
-		a := rand.Float64()
-		b := rand.Float64()
-		want := a + b
-		got, _ := calculator.Add(a, b)
-		if want != got {
-			t.Errorf("Add(%f, %f): want %f, got %f",
-				a, b, want, got)
+		tc := testCase{}
+
+		// Random number of numbers to add from 1 to 10
+		for j := 0; j < rand.Intn(10)+1; j++ {
+			nb := rand.Float64()
+			tc.inputs = append(tc.inputs, nb)
+			tc.want += nb
+		}
+
+		got := calculator.Add(tc.inputs...)
+		if tc.want != got {
+			t.Errorf("Add(%v): want %f, got %f",
+				tc.inputs, tc.want, got)
 		}
 	}
 }
@@ -76,10 +85,9 @@ func TestSubtract(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name        string
-		inputs      []float64
-		want        float64
-		errExpected bool
+		name   string
+		inputs []float64
+		want   float64
 	}
 
 	testCases := []testCase{
@@ -92,7 +100,7 @@ func TestSubtract(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		got, _ := calculator.Substract(tc.inputs...)
+		got := calculator.Substract(tc.inputs...)
 		if tc.want != got {
 			t.Errorf("Substract(%v): %s: want %f, got %f",
 				tc.inputs, tc.name, tc.want, got)
@@ -104,10 +112,9 @@ func TestMultiply(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name        string
-		inputs      []float64
-		want        float64
-		errExpected bool
+		name   string
+		inputs []float64
+		want   float64
 	}
 
 	testCases := []testCase{
@@ -120,7 +127,7 @@ func TestMultiply(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		got, _ := calculator.Multiply(tc.inputs...)
+		got := calculator.Multiply(tc.inputs...)
 		if !closeEnough(tc.want, got, 0.001) {
 			t.Errorf("Multiply(%v): %s: want %.20f, got %.20f",
 				tc.inputs, tc.name, tc.want, got)

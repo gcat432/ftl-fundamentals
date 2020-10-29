@@ -9,32 +9,32 @@ import (
 )
 
 // Add takes some numbers and returns the result of adding them together.
-func Add(inputs ...float64) (float64, error) {
+func Add(inputs ...float64) float64 {
 	res := inputs[0]
 	for _, n := range inputs[1:] {
 		res += n
 	}
-	return res, nil
+	return res
 }
 
 // Subtract takes some numbers and returns the result of subtracting them
 // together.
-func Substract(inputs ...float64) (float64, error) {
+func Substract(inputs ...float64) float64 {
 	res := inputs[0]
 	for _, n := range inputs[1:] {
 		res -= n
 	}
-	return res, nil
+	return res
 }
 
 // Multiply takes some numbers and returns the result of multiplying them
 // together.
-func Multiply(inputs ...float64) (float64, error) {
+func Multiply(inputs ...float64) float64 {
 	res := inputs[0]
 	for _, n := range inputs[1:] {
 		res *= n
 	}
-	return res, nil
+	return res
 }
 
 // Divide takes two numbers and returns the result of dividing them
@@ -92,11 +92,11 @@ func Calculate(s string) (float64, error) {
 	var res float64
 	switch symbol {
 	case '+':
-		res, err = Add(a, b)
+		res = Add(a, b)
 	case '-':
-		res, err = Substract(a, b)
+		res = Substract(a, b)
 	case '*':
-		res, err = Multiply(a, b)
+		res = Multiply(a, b)
 	case '/':
 		res, err = Divide(a, b)
 	}
