@@ -9,38 +9,58 @@ import (
 )
 
 // Add takes some numbers and returns the result of adding them together.
-func Add(inputs ...float64) float64 {
+func Add(inputs ...float64) (float64, error) {
 	res := inputs[0]
+
+	if len(inputs) < 2 {
+		return 0, fmt.Errorf("bad input: %f (only one operand)", res)
+	}
+
 	for _, n := range inputs[1:] {
 		res += n
 	}
-	return res
+	return res, nil
 }
 
 // Subtract takes some numbers and returns the result of subtracting them
 // together.
-func Substract(inputs ...float64) float64 {
+func Substract(inputs ...float64) (float64, error) {
 	res := inputs[0]
+
+	if len(inputs) < 2 {
+		return 0, fmt.Errorf("bad input: %f (only one operand)", res)
+	}
+
 	for _, n := range inputs[1:] {
 		res -= n
 	}
-	return res
+	return res, nil
 }
 
 // Multiply takes some numbers and returns the result of multiplying them
 // together.
-func Multiply(inputs ...float64) float64 {
+func Multiply(inputs ...float64) (float64, error) {
 	res := inputs[0]
+
+	if len(inputs) < 2 {
+		return 0, fmt.Errorf("bad input: %f (only one operand)", res)
+	}
+
 	for _, n := range inputs[1:] {
 		res *= n
 	}
-	return res
+	return res, nil
 }
 
 // Divide takes two numbers and returns the result of dividing them
 // together.
 func Divide(inputs ...float64) (float64, error) {
 	res := inputs[0]
+
+	if len(inputs) < 2 {
+		return 0, fmt.Errorf("bad input: %f (only one operand)", res)
+	}
+
 	for _, n := range inputs[1:] {
 		if n == 0 {
 			return 0, fmt.Errorf("bad input: %f, %f (division by zero is not allowed)", res, n)
@@ -92,11 +112,11 @@ func Calculate(s string) (float64, error) {
 	var res float64
 	switch symbol {
 	case '+':
-		res = Add(a, b)
+		res, err = Add(a, b)
 	case '-':
-		res = Substract(a, b)
+		res, err = Substract(a, b)
 	case '*':
-		res = Multiply(a, b)
+		res, err = Multiply(a, b)
 	case '/':
 		res, err = Divide(a, b)
 	}

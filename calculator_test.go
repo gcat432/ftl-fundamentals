@@ -16,9 +16,10 @@ func TestAdd(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name   string
-		inputs []float64
-		want   float64
+		name        string
+		inputs      []float64
+		want        float64
+		errExpected bool
 	}
 
 	testCases := []testCase{
@@ -28,11 +29,20 @@ func TestAdd(t *testing.T) {
 			inputs: []float64{-2, -3, -4}, want: -9},
 		{name: "Sum of some fractional numbers",
 			inputs: []float64{5.5, -3.2, 9.33, 512.2}, want: 523.83},
+		{name: "Sum of one operand",
+			inputs: []float64{2}, want: 999, errExpected: true},
 	}
 
 	for _, tc := range testCases {
-		got := calculator.Add(tc.inputs...)
-		if tc.want != got {
+		got, err := calculator.Add(tc.inputs...)
+		errReceived := err != nil
+
+		if tc.errExpected != errReceived {
+			t.Fatalf("Add(%v): unexpected error status: %v",
+				tc.inputs, errReceived)
+		}
+
+		if !tc.errExpected && !closeEnough(tc.want, got, 0.001) {
 			t.Errorf("Add(%v): %s: want %f, got %f",
 				tc.inputs, tc.name, tc.want, got)
 		}
@@ -50,7 +60,7 @@ func BenchmarkAdd(b *testing.B) {
 		inputs: []float64{2, 3, 4}}
 
 	for i := 0; i < b.N; i++ {
-		_ = calculator.Add(tc.inputs...)
+		_, _ = calculator.Add(tc.inputs...)
 	}
 }
 
@@ -59,22 +69,34 @@ func TestAddRandom(t *testing.T) {
 	rand.Seed(time.Now().UnixNano())
 
 	type testCase struct {
-		inputs []float64
-		want   float64
+		inputs      []float64
+		want        float64
+		errExpected bool
 	}
 
 	for i := 0; i < 100; i++ {
 		tc := testCase{}
 
-		// Random number of numbers to add from 1 to 10
-		for j := 0; j < rand.Intn(10)+1; j++ {
+		loops := rand.Intn(10) + 1 // At least one operand
+		if loops < 2 {
+			tc.errExpected = true
+		}
+
+		for j := 0; j < loops; j++ {
 			nb := rand.Float64()
 			tc.inputs = append(tc.inputs, nb)
 			tc.want += nb
 		}
 
-		got := calculator.Add(tc.inputs...)
-		if tc.want != got {
+		got, err := calculator.Add(tc.inputs...)
+		errReceived := err != nil
+
+		if tc.errExpected != errReceived {
+			t.Fatalf("Add(%v): unexpected error status: %v",
+				tc.inputs, errReceived)
+		}
+
+		if !tc.errExpected && !closeEnough(tc.want, got, 0.001) {
 			t.Errorf("Add(%v): want %f, got %f",
 				tc.inputs, tc.want, got)
 		}
@@ -85,9 +107,10 @@ func TestSubtract(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name   string
-		inputs []float64
-		want   float64
+		name        string
+		inputs      []float64
+		want        float64
+		errExpected bool
 	}
 
 	testCases := []testCase{
@@ -97,11 +120,20 @@ func TestSubtract(t *testing.T) {
 			inputs: []float64{-2, -3, -4}, want: 5},
 		{name: "Difference of some fractional numbers",
 			inputs: []float64{5.5, -3.2, 9.33, 512.2}, want: -512.83},
+		{name: "Different of one operand",
+			inputs: []float64{2}, want: 999, errExpected: true},
 	}
 
 	for _, tc := range testCases {
-		got := calculator.Substract(tc.inputs...)
-		if tc.want != got {
+		got, err := calculator.Substract(tc.inputs...)
+		errReceived := err != nil
+
+		if tc.errExpected != errReceived {
+			t.Fatalf("Substract(%v): unexpected error status: %v",
+				tc.inputs, errReceived)
+		}
+
+		if !tc.errExpected && !closeEnough(tc.want, got, 0.001) {
 			t.Errorf("Substract(%v): %s: want %f, got %f",
 				tc.inputs, tc.name, tc.want, got)
 		}
@@ -112,9 +144,10 @@ func TestMultiply(t *testing.T) {
 	t.Parallel()
 
 	type testCase struct {
-		name   string
-		inputs []float64
-		want   float64
+		name        string
+		inputs      []float64
+		want        float64
+		errExpected bool
 	}
 
 	testCases := []testCase{
@@ -124,12 +157,21 @@ func TestMultiply(t *testing.T) {
 			inputs: []float64{-2, -3, -4}, want: -24},
 		{name: "Product of some fractional numbers",
 			inputs: []float64{5.5, -3.2, 9.33, 512.2}, want: -84107.338},
+		{name: "Product of one operand",
+			inputs: []float64{2}, want: 999, errExpected: true},
 	}
 
 	for _, tc := range testCases {
-		got := calculator.Multiply(tc.inputs...)
-		if !closeEnough(tc.want, got, 0.001) {
-			t.Errorf("Multiply(%v): %s: want %.20f, got %.20f",
+		got, err := calculator.Multiply(tc.inputs...)
+		errReceived := err != nil
+
+		if tc.errExpected != errReceived {
+			t.Fatalf("Multiply(%v): unexpected error status: %v",
+				tc.inputs, errReceived)
+		}
+
+		if !tc.errExpected && !closeEnough(tc.want, got, 0.001) {
+			t.Errorf("Multiply(%v): %s: want %f, got %f",
 				tc.inputs, tc.name, tc.want, got)
 		}
 	}
@@ -154,6 +196,8 @@ func TestDivide(t *testing.T) {
 			inputs: []float64{6.5, -2.5, 1.3}, want: -2},
 		{name: "Quotient of some positive numbers by zero",
 			inputs: []float64{3, 2, 0, 1}, want: 999, errExpected: true},
+		{name: "Quotient of one operand",
+			inputs: []float64{3}, want: 999, errExpected: true},
 	}
 
 	for _, tc := range testCases {
