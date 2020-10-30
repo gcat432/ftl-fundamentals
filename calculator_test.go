@@ -120,7 +120,7 @@ func TestSubtract(t *testing.T) {
 			inputs: []float64{-2, -3, -4}, want: 5},
 		{name: "Difference of some fractional numbers",
 			inputs: []float64{5.5, -3.2, 9.33, 512.2}, want: -512.83},
-		{name: "Different of one operand",
+		{name: "Difference of one operand",
 			inputs: []float64{2}, want: 999, errExpected: true},
 	}
 
